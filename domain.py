@@ -2,7 +2,6 @@ import sys, socket
 import threading
 import time
 
-
 ip = ""
 hostname = ""
 #a threat to creaate a watchdog, timer type thread that will report back every 30 seconds to show the code is still running
