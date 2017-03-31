@@ -5,6 +5,8 @@ import time
 testing = True
 ip = ""
 hostname = ""
+
+
 #a thread to creaate a watchdog, timer type thread that will report back every 30 seconds to show the code is still running
 class progressthread(threading.Thread):
 
@@ -14,6 +16,12 @@ class progressthread(threading.Thread):
             time.sleep(30)
         print("Complete - Waiting to Kill all Threads... might be slow!")
 # the worker thread - simple at the moment, and badly implemented will be changing to improve at the near future
+
+
+
+
+
+
 class workerthread(threading.Thread):
 
     def run(self):
