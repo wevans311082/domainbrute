@@ -2,9 +2,10 @@ import sys, socket
 import threading
 import time
 
+testing = True
 ip = ""
 hostname = ""
-#a threat to creaate a watchdog, timer type thread that will report back every 30 seconds to show the code is still running
+#a thread to creaate a watchdog, timer type thread that will report back every 30 seconds to show the code is still running
 class progressthread(threading.Thread):
 
     def run(self):
@@ -54,16 +55,6 @@ def load_sd_stack():
         nosd = domainlist.size()
         print("Loaded " + str(nosd) + " Domains prefixes to be check")
 
-def lookup_from_stack(dom):
-    #an example stack lookup function - early debugging
-    for x in range(domainlist.size()):
-        check=str(domainlist.pop().rstrip('\n')+"."+dom)
-        print()
-        ip = lookup_host(check)
-        if ip != 0:
-            print(check + "[" + str(ip) + "]")
-
-
 def create_threads():
     timer = progressthread()
     timer.start()
@@ -82,14 +73,6 @@ def lookup_host(name):
         return 0
 
 
-def brute_subdomains(dom):
-    with open('subdomainback.txt') as domains:
-        for line in domains:
-            ip=lookup_host(line.rstrip('\n')+"."+dom)
-            if ip != 0:
-                print(line.rstrip('\n')+"."+dom + "["+str(ip)+"]")
-
-
 def main():
 # main code
 
@@ -97,9 +80,9 @@ def main():
     global domainlist
     global hostname
 
-
-    nosd=""
+    nosd = ""
     domainlist = Stack()
+
 # check if the argument provided is valid
     try:
         hostname=sys.argv[1]
@@ -109,25 +92,40 @@ def main():
             print(hostname + " is Invalid")
         else:
             print(result)
-          #  brute_subdomains(hostname)
-          #  lookup_from_stack(hostname)
+
             create_threads()
     except Exception:
         # if the argv is invalid and bombs out - lets use a test domain for now
         # a help page will be provided later
-        print ("You must provide a hostname - TEST MODE")
-        hostname = "hazzy.co.uk"
-        result = lookup_host(hostname)
-        #load the contents of the domain subfile into a stack
-        load_sd_stack()
-        if result == 0:
-            print(hostname + " is Invalid")
-        else:
-            print(result)
-            #  brute_subdomains(hostname)
-            #  lookup_from_stack(hostname)
-            create_threads()
-            print("Testing Complete")
-        exit(31)
+        print ("Unable to Resolve Hostname %s",hostname)
+        if testing == True:
+            test_case()
+        #display usage
+        display_usage()
+
+
+def test_case():
+    hostname = "hazzy.co.uk"
+    result = lookup_host(hostname)
+    # load the contents of the domain subfile into a stack
+    load_sd_stack()
+    if result == 0:
+        print(hostname + " is Invalid")
+    else:
+        print(result)
+        #  brute_subdomains(hostname)
+        #  lookup_from_stack(hostname)
+        create_threads()
+        print("Testing Complete")
+        sys.exit(0)
+
+
+def display_usage():
+    #display usage message
+    print("Usage: domain.py <domainname>")
+    sys.exit(1)
+
 if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        display_usage()
     main()
